@@ -3,7 +3,7 @@
       *PROGRAMA: TRPLAN64  Acreditador de recaudo                    *
       *COMPAÑIA: Pullservi Internacional, S.A.                       *
       *USUARIO:  JVARGAS                                             *
-      *FECHA:    24/07/12  18:56:42                                  *
+      *FECHA:    24/05/02  17:09:12                                  *
       *GENERADOR:SNAP Release 4.5                                    *
       ****************************************************************
      H DECEDIT('0,') DATEDIT(*DMY.)
@@ -2532,53 +2532,6 @@
      C* TEXTO: Se modifica para limpiar variables de valor y cuotas de P
      C*        por cada planilla procesada en acreditación de rezagos.
      C* REQUE: 14369
-     C*
-     C* FECHA: Mayo 28 de 2024
-     C* AUTOR: Jesús Fernando Becerra Cardozo
-     C* TEXTO: Se modifica para mover el módulo M14085 que acumula valor
-     C*        de cotizaciones luego de ejecutar el módulo que verifica
-     C*        deudas M14080 para calcular correctamente los intereses d
-     C*        de deuda que se obtienen en módulo M14083 y que se graban
-     C*        en el detalle de deuda.
-     C* REQUE: 14297-6
-     C*
-     C* FECHA: Junio 4 de 2024
-     C* AUTOR: Jimmy Alexander Vargas Castro
-     C* TEXTO: Se modifica M13000 para que no aplique pago adelantado si
-     C*        valor es cero.
-     C* REQUE: 14369
-     C*
-     C* FECHA: Junio 5 de 2024
-     C* AUTOR: Jimmy Alexander Vargas Castro
-     C* TEXTO: Se modifica recalculo de salario para planillas independi
-     C*        tes anteriores a fecha vigencia reforma ley 797 para incl
-     C*        los intereses.
-     C* REQUE: 13856
-     C*
-     C* FECHA: Junio 6 de 2024
-     C* AUTOR: Jesús Fernando Becerra Cardozo
-     C* TEXTO: Se modifica para diferenciar la acreditación de rezagos d
-     C*        omisión (41/42) para que sean procesados con condiciones
-     C*        de planilla Z y tipo de pago 06 (planilla extraordinaria)
-     C* REQUE: 14297-2
-     C*
-     C* FECHA: Junio 28 de 2024
-     C* AUTOR: Jimmy Alexander Vargas Castro
-     C* TEXTO: Se modifica para validar parámetros según tarifa del deta
-     C*        para periodos de decreto.
-     C* REQUE: 13854-2
-     C*
-     C* FECHA: Julio 4 de 2024
-     C* AUTOR: Jimmy Alexander Vargas Castro
-     C* TEXTO: Se modifica para que al generar tx 03-22 si no está leida
-     C*        planilla se asigne la planilla de la deuda.
-     C* REQUE: 14379
-     C*
-     C* FECHA: Julio 5 de 2024
-     C* AUTOR: Jimmy Alexander Vargas Castro
-     C* TEXTO: Se modifica M11100 para validar si la cotización cubre al
-     C*        riesgo + FGPM.
-     C* REQUE: 14409
      C******************************************************************
      C*     IMPORTANTE: VER MODULO COMPIL
      C*-----------------------------------------------------------------
@@ -3010,9 +2963,6 @@
      C                   EXSR      M00060
      C*SINO
      C                   ELSE
-     C* Libera registro
-     C*INICIAR PAGARC
-     C     *LOVAL        SETLL     PAGARC                             70
      C* Total de planillas erradas
      C*SUMAR 1 ZTPLAE
      C                   ADD       1             ZTPLAE
@@ -3662,12 +3612,11 @@
      C                   END
      C*FIN
      C                   END
-     C*LIMPIAR ZTIPLP ZNJ ZTPVAE ZTPVDF ZTPORI
+     C*LIMPIAR ZTIPLP ZNJ ZTPVAE ZTPVDF
      C                   CLEAR                   ZTIPLP
      C                   CLEAR                   ZNJ
      C                   CLEAR                   ZTPVAE
      C                   CLEAR                   ZTPVDF
-     C                   CLEAR                   ZTPORI
      C* Programa que retorna Naturaleza juridica ZNJ de PLAA66:
      C*LLAMAR TRPLCO50(PLANU3 PLANUM ZNJ ZTIPLP)
      C                   CALL      'TRPLCO50'
@@ -3675,9 +3624,6 @@
      C                   PARM                    PLANUM
      C                   PARM                    ZNJ
      C                   PARM                    ZTIPLP
-     C* Tipo planilla original
-     C*PASAR ZTPORI ZTIPLP
-     C                   MOVEL     ZTIPLP        ZTPORI
      C*SI ZTIPLP <> *BLANCO
      C     ZTIPLP        IFNE      *BLANK
      C*LLAMAR RPTPVE50(ZTIPLP ZTPVAE ZTPVDF)
@@ -4842,21 +4788,6 @@
      C*LLAMAR TRHPAR55($$REG1)
      C                   CALL      'TRHPAR55'
      C                   PARM                    $$REG1
-     C* Guarda valores en temporal por si cambian en M98415
-     C*MOVER ZH1POR ZHPPOR
-     C                   Z-ADD     ZHPPOR        ZH1POR
-     C*MOVER ZH1PO1 ZHPPO1
-     C                   Z-ADD     ZHPPO1        ZH1PO1
-     C*MOVER ZH1PO2 ZHPPO2
-     C                   Z-ADD     ZHPPO2        ZH1PO2
-     C*MOVER ZH1PO4 ZHPPO4
-     C                   Z-ADD     ZHPPO4        ZH1PO4
-     C*MOVER ZH1P49 ZHPP49
-     C                   Z-ADD     ZHPP49        ZH1P49
-     C*MOVER ZH1P50 ZHPP50
-     C                   Z-ADD     ZHPP50        ZH1P50
-     C*MOVER ZH1N05 ZHPN05
-     C                   Z-ADD     ZHPN05        ZH1N05
      C*PASAR ZPLAAA DEUNUM
      C                   MOVEL     DEUNUM        ZPLAAA
      C* Parametros decreto 558
@@ -4923,21 +4854,6 @@
      C*LLAMAR TRHPAR55($$REG1)
      C                   CALL      'TRHPAR55'
      C                   PARM                    $$REG1
-     C* Guarda valores en temporal por si cambian en M98415
-     C*MOVER ZH1POR ZHPPOR
-     C                   Z-ADD     ZHPPOR        ZH1POR
-     C*MOVER ZH1PO1 ZHPPO1
-     C                   Z-ADD     ZHPPO1        ZH1PO1
-     C*MOVER ZH1PO2 ZHPPO2
-     C                   Z-ADD     ZHPPO2        ZH1PO2
-     C*MOVER ZH1PO4 ZHPPO4
-     C                   Z-ADD     ZHPPO4        ZH1PO4
-     C*MOVER ZH1P49 ZHPP49
-     C                   Z-ADD     ZHPP49        ZH1P49
-     C*MOVER ZH1P50 ZHPP50
-     C                   Z-ADD     ZHPP50        ZH1P50
-     C*MOVER ZH1N05 ZHPN05
-     C                   Z-ADD     ZHPN05        ZH1N05
      C*PASAR ZPLAAA PLANU1
      C                   MOVEL     PLANU1        ZPLAAA
      C* Parametros decreto 558
@@ -6454,21 +6370,6 @@
      C                   END
      C*PASAR ZPLAAA PLANU1
      C                   MOVEL     PLANU1        ZPLAAA
-     C* Guarda valores en temporal por si cambian en M98415
-     C*MOVER ZH1POR ZHPPOR
-     C                   Z-ADD     ZHPPOR        ZH1POR
-     C*MOVER ZH1PO1 ZHPPO1
-     C                   Z-ADD     ZHPPO1        ZH1PO1
-     C*MOVER ZH1PO2 ZHPPO2
-     C                   Z-ADD     ZHPPO2        ZH1PO2
-     C*MOVER ZH1PO4 ZHPPO4
-     C                   Z-ADD     ZHPPO4        ZH1PO4
-     C*MOVER ZH1P49 ZHPP49
-     C                   Z-ADD     ZHPP49        ZH1P49
-     C*MOVER ZH1P50 ZHPP50
-     C                   Z-ADD     ZHPP50        ZH1P50
-     C*MOVER ZH1N05 ZHPN05
-     C                   Z-ADD     ZHPN05        ZH1N05
      C* Parametros decreto 558
      C*EJECUTAR M98415
      C                   EXSR      M98415
@@ -6627,21 +6528,6 @@
      C*LLAMAR TRHPAR55($$REG1)
      C                   CALL      'TRHPAR55'
      C                   PARM                    $$REG1
-     C* Guarda valores en temporal por si cambian en M98415
-     C*MOVER ZH1POR ZHPPOR
-     C                   Z-ADD     ZHPPOR        ZH1POR
-     C*MOVER ZH1PO1 ZHPPO1
-     C                   Z-ADD     ZHPPO1        ZH1PO1
-     C*MOVER ZH1PO2 ZHPPO2
-     C                   Z-ADD     ZHPPO2        ZH1PO2
-     C*MOVER ZH1PO4 ZHPPO4
-     C                   Z-ADD     ZHPPO4        ZH1PO4
-     C*MOVER ZH1P49 ZHPP49
-     C                   Z-ADD     ZHPP49        ZH1P49
-     C*MOVER ZH1P50 ZHPP50
-     C                   Z-ADD     ZHPP50        ZH1P50
-     C*MOVER ZH1N05 ZHPN05
-     C                   Z-ADD     ZHPN05        ZH1N05
      C*PASAR ZPLAAA PLANU1
      C                   MOVEL     PLANU1        ZPLAAA
      C* Parametros decreto 558
@@ -8349,14 +8235,13 @@
      C                   CLEAR                   ZTPLAE
      C*FIN
      C                   END
-     C*LIMPIAR ZOPCI2 ZEMPAR ZFSPRE ZVFSRE ZCFSRE ZDEURE ZARFGP
+     C*LIMPIAR ZOPCI2 ZEMPAR ZFSPRE ZVFSRE ZCFSRE ZDEURE
      C                   CLEAR                   ZOPCI2
      C                   CLEAR                   ZEMPAR
      C                   CLEAR                   ZFSPRE
      C                   CLEAR                   ZVFSRE
      C                   CLEAR                   ZCFSRE
      C                   CLEAR                   ZDEURE
-     C                   CLEAR                   ZARFGP
      C                   ENDSR
      C*==================================================================
      C*==  Actualizar histórico de conceptos con PLAN6I                ==
@@ -8748,11 +8633,6 @@
      C                   END
      C*FIN
      C                   END
-     C*SINO
-     C                   ELSE
-     C* Libera registro
-     C*INICIAR PAGARC
-     C     *LOVAL        SETLL     PAGARC                             70
      C*FIN
      C                   END
      C* No hay error
@@ -8769,12 +8649,6 @@
      C                   Z-ADD     ZVRPAD        ZVALHI
      C*LIMPIAR ZCUOHI
      C                   CLEAR                   ZCUOHI
-     C*SI PLANUM = *CERO
-     C     PLANUM        IFEQ      *ZERO
-     C*MOVER PLANUM DEUNUM
-     C                   Z-ADD     DEUNUM        PLANUM
-     C*FIN
-     C                   END
      C* Actualizar HISAR4
      C*EJECUTAR M00055
      C                   EXSR      M00055
@@ -8812,9 +8686,6 @@
      C                   END
      C*SINO
      C                   ELSE
-     C* Libera registro
-     C*INICIAR PAGARC
-     C     *LOVAL        SETLL     PAGARC                             70
      C* Completar/Devolver trans
      C*SI ZT@COM <> 'N'
      C     ZT@COM        IFNE      'N'
@@ -10332,9 +10203,6 @@
      C                   EXSR      M00019
      C*FIN
      C                   END
-     C* Tipo de pago de planilla
-     C*PASAR ZPLT03 PLAT03
-     C                   MOVEL     PLAT03        ZPLT03
      C                   ENDSR
      C*==================================================================
      C*==  Limpiar variables de HISAR4                                 ==
@@ -10831,85 +10699,6 @@
      C                   CLEAR                   MOVV12
      C                   CLEAR                   MOVV14
      C                   CLEAR                   MOVCO1
-     C                   END
-     C                   ENDSR
-     C*==================================================================
-     C*==  Validar condiciones pago omisión                            ==
-     C*==                                                              ==
-     C*==================================================================
-     C     M00220        BEGSR
-     C*LIMPIAR ZRN117 ZRESVA ZEXPLZ ZRZOMI
-     C                   CLEAR                   ZRN117
-     C                   CLEAR                   ZRESVA
-     C                   CLEAR                   ZEXPLZ
-     C                   CLEAR                   ZRZOMI
-     C* Rezagos de omisión
-     C*SI REZTI3 = '41' O REZTI3 = '42'
-     C     REZTI3        IFEQ      '41'
-     C     REZTI3        OREQ      '42'
-     C* Validar respuesta 117 a nov. 004
-     C*MOVER ZRESVA 117
-     C                   Z-ADD     117           ZRESVA
-     C*LLAMAR RPENVR50 (REZTI4 REZNR3 REZTI5 REZNRO REZNR1 REZNR2 REZPER
-     C                   CALL      'RPENVR50'
-     C                   PARM                    REZTI4
-     C                   PARM                    REZNR3
-     C                   PARM                    REZTI5
-     C                   PARM                    REZNRO
-     C                   PARM                    REZNR1
-     C                   PARM                    REZNR2
-     C                   PARM                    REZPER
-     C                   PARM                    ZRN117
-     C                   PARM                    ZRESVA
-     C* Existe respuesta 117 a nov. 004
-     C*SI ZRN117 = 'S'
-     C     ZRN117        IFEQ      'S'
-     C* Validar si existe planilla Z acreditada para empleador y afiliad
-     C*LLAMAR RPPLAN56 (REZTI4 REZNR3 REZTI5 REZTIP REZID1 REZNRO ZEXPLZ
-     C                   CALL      'RPPLAN56'
-     C                   PARM                    REZTI4
-     C                   PARM                    REZNR3
-     C                   PARM                    REZTI5
-     C                   PARM                    REZTIP
-     C                   PARM                    REZID1
-     C                   PARM                    REZNRO
-     C                   PARM                    ZEXPLZ
-     C*SI ZEXPLZ = 'S'
-     C     ZEXPLZ        IFEQ      'S'
-     C* Existe planilla Z acreditada para empleador y afiliado
-     C* Ind. rezago de omisión
-     C*PASAR ZRZOMI 'S'
-     C                   MOVEL     'S'           ZRZOMI
-     C*FIN
-     C                   END
-     C*FIN
-     C                   END
-     C*FIN
-     C                   END
-     C* Ind. rezago de omisión
-     C*SI ZRZOMI = 'S'
-     C     ZRZOMI        IFEQ      'S'
-     C* Tipo pago planilla extraordinaria
-     C*PASAR PLAT03 '06'
-     C                   MOVEL     '06'          PLAT03
-     C* Planilla Z
-     C*PASAR ZTIPLP 'Z'
-     C                   MOVEL     'Z'           ZTIPLP
-     C*SQL
-     C/EXEC SQL
-     C+  SELECT HISP60 INTO :ZISP60
-     C+  FROM SBHISAR6 WHERE
-     C+  HISPE1 = :PLAPER
-     C/END-EXEC
-     C*SINO
-     C                   ELSE
-     C* Tipo pago original de la planilla
-     C*PASAR PLAT03 ZPLT03
-     C                   MOVEL     ZPLT03        PLAT03
-     C* Tipo de planilla original PLAA66
-     C*PASAR ZTIPLP ZTPORI
-     C                   MOVEL     ZTPORI        ZTIPLP
-     C*FIN
      C                   END
      C                   ENDSR
      C*==================================================================
@@ -11892,34 +11681,6 @@
      C*==                                                              ==
      C*==================================================================
      C     M11100        BEGSR
-     C* Ind. rezago de omisión
-     C*SI ZRZOMI = 'S'
-     C     ZRZOMI        IFEQ      'S'
-     C* Valores subsistencia
-     C*LIMPIAR ZVSFSP ZVFGPM ZPSFSP
-     C                   CLEAR                   ZVSFSP
-     C                   CLEAR                   ZVFGPM
-     C                   CLEAR                   ZPSFSP
-     C*LIMPIAR ZCOTAR ZCOTFS ZCOTSF ZCOTFG ZSALVA
-     C                   CLEAR                   ZCOTAR
-     C                   CLEAR                   ZCOTFS
-     C                   CLEAR                   ZCOTSF
-     C                   CLEAR                   ZCOTFG
-     C                   CLEAR                   ZSALVA
-     C*CALCULAR ZCOTOB = REZCOT + REZCO4 + REZVA1 + REZINT + REZIN9 - RE
-     C     REZCOT        ADD       REZCO4        V$CA1           030 9
-     C     V$CA1         ADD       REZVA1        V$CA1
-     C     V$CA1         ADD       REZINT        V$CA1
-     C     V$CA1         ADD       REZIN9        V$CA1
-     C     V$CA1         SUB       REZDEU        ZCOTOB
-     C* Cot. voluntaria afiliado
-     C*MOVER ZCOTVA DETCO1
-     C                   Z-ADD     DETCO1        ZCOTVA
-     C* Cot. voluntaria empleador
-     C*MOVER ZCOTVE DETCO2
-     C                   Z-ADD     DETCO2        ZCOTVE
-     C*SINO
-     C                   ELSE
      C* Ver ocupación especial
      C*EJECUTAR M11101
      C                   EXSR      M11101
@@ -11963,13 +11724,12 @@
      C* No hay error
      C*SI ZSALIR <> '1'
      C     ZSALIR        IFNE      '1'
-     C*LIMPIAR ZCOTAR ZCOTFS ZCOTSF ZCOTFG ZSALVA ZARFGP
+     C*LIMPIAR ZCOTAR ZCOTFS ZCOTSF ZCOTFG ZSALVA
      C                   CLEAR                   ZCOTAR
      C                   CLEAR                   ZCOTFS
      C                   CLEAR                   ZCOTSF
      C                   CLEAR                   ZCOTFG
      C                   CLEAR                   ZSALVA
-     C                   CLEAR                   ZARFGP
      C*
      C* Se calcula el valor de la cotización :Si el detalle no es rezago
      C* o Si el detalle es rezago y el proceso es de acred. de rezagos
@@ -12076,14 +11836,6 @@
      C                   CLEAR                   ZVFGPM
      C*FIN
      C                   END
-     C*CALCULAR ZARFGP = ZVFGPM + ZCOTAR
-     C     ZVFGPM        ADD       ZCOTAR        ZARFGP
-     C*SI ZARFGP > ZCOTOB
-     C     ZARFGP        IFGT      ZCOTOB
-     C*CALCULAR ZCOTAR = ZCOTOB - ZVFGPM
-     C     ZCOTOB        SUB       ZVFGPM        ZCOTAR
-     C*FIN
-     C                   END
      C*SI ZCOTOB > 0 Y ZCOTOB>ZVFGPM Y ZCOTOB>ZCOTAR
      C     ZCOTOB        IFGT      0
      C     ZCOTOB        ANDGT     ZVFGPM
@@ -12109,47 +11861,6 @@
      C* Valor FGPM
      C*MOVER ZCOTFG ZVFGPM
      C                   Z-ADD     ZVFGPM        ZCOTFG
-     C*SI ZAPLDE='S'
-     C     ZAPLDE        IFEQ      'S'
-     C* Si DETTA1 no es el 3%
-     C*SI DETTA1 <> ZI0P14
-     C     DETTA1        IFNE      ZI0P14
-     C*MOVER ZHPPOR ZH1POR
-     C                   Z-ADD     ZH1POR        ZHPPOR
-     C*MOVER ZHPPO1 ZH1PO1
-     C                   Z-ADD     ZH1PO1        ZHPPO1
-     C*MOVER ZHPPO2 ZH1PO2
-     C                   Z-ADD     ZH1PO2        ZHPPO2
-     C*MOVER ZHPPO4 ZH1PO4
-     C                   Z-ADD     ZH1PO4        ZHPPO4
-     C*MOVER ZHPP49 ZH1P49
-     C                   Z-ADD     ZH1P49        ZHPP49
-     C*MOVER ZHPP50 ZH1P50
-     C                   Z-ADD     ZH1P50        ZHPP50
-     C*MOVER ZHPN05 ZH1N05
-     C                   Z-ADD     ZH1N05        ZHPN05
-     C*SINO
-     C                   ELSE
-     C*MOVER ZHPPOR ZI0P14
-     C                   Z-ADD     ZI0P14        ZHPPOR
-     C*MOVER ZHPPO1 ZI0P15
-     C                   Z-ADD     ZI0P15        ZHPPO1
-     C*MOVER ZHPPO2 ZI0P16
-     C                   Z-ADD     ZI0P16        ZHPPO2
-     C*MOVER ZHPPO4 ZI0P18
-     C                   Z-ADD     ZI0P18        ZHPPO4
-     C*MOVER ZHPP49 ZI0P20
-     C                   Z-ADD     ZI0P20        ZHPP49
-     C*MOVER ZHPP50 ZI0P21
-     C                   Z-ADD     ZI0P21        ZHPP50
-     C*MOVER ZHPN05 ZI0N12
-     C                   Z-ADD     ZI0N12        ZHPN05
-     C*FIN
-     C                   END
-     C*CALCULAR (R) ZSALFS = ZHPVA2 * ZHPN05
-     C     ZHPVA2        MULT(H)   ZHPN05        ZSALFS
-     C*FIN
-     C                   END
      C*SI DETVA7 >= ZSALFS O ZTPVAE = '1' Y ZTIPVL = '3'
      C     DETVA7        IFGE      ZSALFS
      C     ZTPVAE        OREQ      '1'
@@ -12329,24 +12040,11 @@
      C                   END
      C*FIN
      C                   END
-     C*FIN
-     C                   END
      C* Este total de planilla se utiliza para identificar la forma de
      C* prorrateo de las cotizaciones en una planilla de tercero
-     C* Ind. rezago de omisión
-     C*SI ZRZOMI = 'S'
-     C     ZRZOMI        IFEQ      'S'
-     C*CALCULAR (R) ZTOPLA = ZTOPLA + ZCOTOB + ZCOTVA + ZCOTVE
-     C     ZTOPLA        ADD       ZCOTOB        V$CA1           030 9
-     C     V$CA1         ADD       ZCOTVA        V$CA1
-     C     V$CA1         ADD(H)    ZCOTVE        ZTOPLA
-     C*SINO
-     C                   ELSE
      C*CALCULAR (R) ZTOPLA = ZTOPLA + DETTOT + DETV14
      C     ZTOPLA        ADD       DETTOT        V$CA1           030 9
      C     V$CA1         ADD(H)    DETV14        ZTOPLA
-     C*FIN
-     C                   END
      C                   ENDSR
      C*==================================================================
      C*==  Verifica si afilaido tiene ocupación especial               ==
@@ -12432,11 +12130,9 @@
      C*==================================================================
      C     M11105        BEGSR
      C* Valor conciliado
-     C*CALCULAR ZVALCO = PLAVAL-DETCO1-DETCO2-PLAREC-PLAIN7
+     C*CALCULAR ZVALCO = PLAVAL - DETCO1 - DETCO2
      C     PLAVAL        SUB       DETCO1        V$CA1           030 9
-     C     V$CA1         SUB       DETCO2        V$CA1
-     C     V$CA1         SUB       PLAREC        V$CA1
-     C     V$CA1         SUB       PLAIN7        ZVALCO
+     C     V$CA1         SUB       DETCO2        ZVALCO
      C* Vlr. cot. F. solidaridad
      C*SI DETCTA > *CERO
      C     DETCTA        IFGT      *ZERO
@@ -13830,9 +13526,6 @@
      C                   EXSR      M12205
      C*SINO
      C                   ELSE
-     C* Rezago no es de omisión
-     C*SI ZRZOMI <> 'S'
-     C     ZRZOMI        IFNE      'S'
      C*SI ZPLART='07' Y ZTPGRT<>'08' Y ZTPGRT<>'13' O PLATIP='07' Y PLAT
      C     ZPLART        IFEQ      '07'
      C     ZTPGRT        ANDNE     '08'
@@ -13854,13 +13547,6 @@
      C     V$CA1         ADD       ZSICVE        V$CA1
      C     V$CA1         ADD       ZSINAR        V$CA1
      C     V$CA1         ADD(H)    ZSAIFG        ZTOSUM
-     C*SINO
-     C                   ELSE
-     C* Total planilla sin intereses
-     C*MOVER ZTOSUM ZTOPLA
-     C                   Z-ADD     ZTOPLA        ZTOSUM
-     C*FIN
-     C                   END
      C*SINO
      C                   ELSE
      C* Total planilla sin intereses
@@ -14076,13 +13762,11 @@
      C                   CALL      'TRFORL50'
      C                   PARM                    ZFECDE
      C                   PARM                    ZINDLI
-     C*SI PLATIP='07' Y PLAT03='07' O ZPLART='07' Y ZTPGRT='07' O PLATIP
+     C*SI PLATIP='07' Y PLAT03='07' O ZPLART='07' Y ZTPGRT='07'
      C     PLATIP        IFEQ      '07'
      C     PLAT03        ANDEQ     '07'
      C     ZPLART        OREQ      '07'
      C     ZTPGRT        ANDEQ     '07'
-     C     PLATIP        OREQ      '07'
-     C     ZPLT03        ANDEQ     '07'
      C* Tipo de planilla auxiliar
      C*LIMPIAR ZPLAUX
      C                   CLEAR                   ZPLAUX
@@ -15577,8 +15261,6 @@
      C* Vlr. a hoy pago adelantado
      C*CALCULAR (R) ZVRPA = PAGCU3 * HISCU2
      C     PAGCU3        MULT(H)   HISCU2        ZVRPA
-     C*SI ZVRPA > *CERO
-     C     ZVRPA         IFGT      *ZERO
      C*SI ZSACOT < ZVRPA
      C     ZSACOT        IFLT      ZVRPA
      C* Cuotas pago adelantado
@@ -15641,8 +15323,6 @@
      C* Indic. acred. P.A. 1=Si
      C*PASAR ZINAPA '1'
      C                   MOVEL     '1'           ZINAPA
-     C*FIN
-     C                   END
      C*FIN
      C                   END
      C*LEER PAGARC06(PLANU4)
@@ -16998,9 +16678,6 @@
      C*==                                                              ==
      C*==================================================================
      C     M14040        BEGSR
-     C* Rezago no es de omisión
-     C*SI ZRZOMI <> 'S'
-     C     ZRZOMI        IFNE      'S'
      C* Ingreso o Ingreso - Retiro de dependientes
      C* Tipo planilla y tipo cot
      C*EJECUTAR M14027
@@ -17008,7 +16685,7 @@
      C* Nov ingreso ó retiro/ingreso
      C*SI ZNOING = 'X'
      C     ZNOING        IFEQ      'X'
-     C* Depen/indep/situado/terceros/Volunta./cooper.
+     C* Depen/indep/situado/terceros/Volunta./cooperados
      C*SI ZTIPLA = '01' O ZTIPLA = '02' O ZTIPLA = '04' O ZTIPLA = '07'
      C     ZTIPLA        IFEQ      '01'
      C     ZTIPLA        OREQ      '02'
@@ -17259,8 +16936,6 @@
      C* Depura dup A-E volunt
      C*EJECUTAR M00119
      C                   EXSR      M00119
-     C*FIN
-     C                   END
      C                   ENDSR
      C*==================================================================
      C*==  Actualiza relación afiliado empleador (continuación)        ==
@@ -23172,10 +22847,9 @@
      C                   END
      C*
      C* Proceso por terceros
-     C*SI ZINDTE = 'S' Y PLATIP = '07' Y ZRZOMI <> 'S'
+     C*SI ZINDTE = 'S' Y PLATIP = '07'
      C     ZINDTE        IFEQ      'S'
      C     PLATIP        ANDEQ     '07'
-     C     ZRZOMI        ANDNE     'S'
      C* Valor de interés compuesto
      C*PASAR ZIND '4'
      C                   MOVEL     '4'           ZIND
@@ -27120,19 +26794,9 @@
      C* Ind. vigencia Siafp
      C*PASAR MOVI11 '1'
      C                   MOVEL     '1'           MOVI11
-     C* Rezago no es de omisión
-     C*SI ZRZOMI <> 'S'
-     C     ZRZOMI        IFNE      'S'
      C* Concepto
      C*MOVER MOVTIP '32'
      C                   MOVE      '32'          MOVTIP
-     C*SINO
-     C                   ELSE
-     C* Rezago de omisión
-     C*MOVER MOVTIP '52'
-     C                   MOVE      '52'          MOVTIP
-     C*FIN
-     C                   END
      C*FINCASOS
      C                   ENDSL
      C*FIN
@@ -29894,9 +29558,6 @@
      C*==                                                              ==
      C*==================================================================
      C     M14550        BEGSR
-     C* Rezago no es de omisión
-     C*SI ZRZOMI <> 'S'
-     C     ZRZOMI        IFNE      'S'
      C* Valor C.V.A.
      C*SI DETCO1 <> *CERO
      C     DETCO1        IFNE      *ZERO
@@ -30565,123 +30226,6 @@
      C* Vlr disp. distrib.
      C*RESTAR ZVDCVE ZVTDIS
      C                   SUB       ZVDCVE        ZVTDIS
-     C*FIN
-     C                   END
-     C* Procesa rezago de omisión
-     C*SINO
-     C                   ELSE
-     C* Valor C.V.A.
-     C*SI DETCO1 <> *CERO
-     C     DETCO1        IFNE      *ZERO
-     C* Valor C.V.A.
-     C*MOVER ZVDCVA DETCO1
-     C                   Z-ADD     DETCO1        ZVDCVA
-     C*CALCULAR (R) ZCUCVA = (ZVDCVA * (ZCUTER - ZCUDIT))/(ZTOSUM - ZTOT
-     C     ZCUTER        SUB       ZCUDIT        V$CA1           030 9
-     C     ZVDCVA        MULT      V$CA1         V$CA1
-     C     ZTOSUM        SUB       ZTOTER        V$CA2           030 9
-     C     V$CA1         DIV(H)    V$CA2         ZCUCVA
-     C* Cuotas distribuidas terceros
-     C*SUMAR ZCUCVA ZCUDIT
-     C                   ADD       ZCUCVA        ZCUDIT
-     C* Total procesado terceros
-     C*SUMAR ZVDCVA ZTOTER
-     C                   ADD       ZVDCVA        ZTOTER
-     C* Cuotas disp. distr.
-     C*RESTAR ZCUCVA ZCTDIS
-     C                   SUB       ZCUCVA        ZCTDIS
-     C* Vlr disp. distrib.
-     C*RESTAR ZVDCVA ZVTDIS
-     C                   SUB       ZVDCVA        ZVTDIS
-     C*FIN
-     C                   END
-     C*CALCULAR ZVROMI = REZCOT + REZCO4 + REZVA1 + REZINT + REZIN9 - RE
-     C     REZCOT        ADD       REZCO4        V$CA1           030 9
-     C     V$CA1         ADD       REZVA1        V$CA1
-     C     V$CA1         ADD       REZINT        V$CA1
-     C     V$CA1         ADD       REZIN9        V$CA1
-     C     V$CA1         SUB       REZDEU        ZVROMI
-     C* Reportado por C.O
-     C*MOVER ZVRDCO ZVROMI
-     C                   Z-ADD     ZVROMI        ZVRDCO
-     C* Existe saldo en el depósito
-     C*SI ZVTDIS > *CERO Y ZVRDCO <> *CERO
-     C     ZVTDIS        IFGT      *ZERO
-     C     ZVRDCO        ANDNE     *ZERO
-     C* Valor C.O
-     C*SI ZVRDCO < ZVTDIS
-     C     ZVRDCO        IFLT      ZVTDIS
-     C* Valor C.O
-     C*MOVER ZVDCO ZVRDCO
-     C                   Z-ADD     ZVRDCO        ZVDCO
-     C*CALCULAR (R) ZCUCO = (ZVDCO * (ZCUTER - ZCUDIT))/(ZTOSUM - ZTOTER
-     C     ZCUTER        SUB       ZCUDIT        V$CA1           030 9
-     C     ZVDCO         MULT      V$CA1         V$CA1
-     C     ZTOSUM        SUB       ZTOTER        V$CA2           030 9
-     C     V$CA1         DIV(H)    V$CA2         ZCUCO
-     C*SINO
-     C                   ELSE
-     C* Vlor C.O
-     C*MOVER ZVDCO ZVTDIS
-     C                   Z-ADD     ZVTDIS        ZVDCO
-     C* Cuotas C.O
-     C*MOVER ZCUCO ZCTDIS
-     C                   Z-ADD     ZCTDIS        ZCUCO
-     C*FIN
-     C                   END
-     C* Cuotas distribuidas terceros
-     C*SUMAR ZCUCO  ZCUDIT
-     C                   ADD       ZCUCO         ZCUDIT
-     C* Total procesado terceros
-     C*SUMAR ZVDCO  ZTOTER
-     C                   ADD       ZVDCO         ZTOTER
-     C* Cuotas disp. distr.
-     C*RESTAR ZCUCO ZCTDIS
-     C                   SUB       ZCUCO         ZCTDIS
-     C* Vlr disp. distrib.
-     C*RESTAR ZVDCO ZVTDIS
-     C                   SUB       ZVDCO         ZVTDIS
-     C*FIN
-     C                   END
-     C* Existe saldo en el depósito
-     C*SI ZVTDIS > *CERO Y DETCO2 <> *CERO
-     C     ZVTDIS        IFGT      *ZERO
-     C     DETCO2        ANDNE     *ZERO
-     C* Valor C.V.E
-     C*SI DETCO2 < ZVTDIS
-     C     DETCO2        IFLT      ZVTDIS
-     C* Valor C.V.E
-     C*MOVER ZVDCVE DETCO2
-     C                   Z-ADD     DETCO2        ZVDCVE
-     C*CALCULAR (R) ZCUCVE= (ZVDCVE * (ZCUTER - ZCUDIT))/(ZTOSUM - ZTOTE
-     C     ZCUTER        SUB       ZCUDIT        V$CA1           030 9
-     C     ZVDCVE        MULT      V$CA1         V$CA1
-     C     ZTOSUM        SUB       ZTOTER        V$CA2           030 9
-     C     V$CA1         DIV(H)    V$CA2         ZCUCVE
-     C*SINO
-     C                   ELSE
-     C* Valor C.V.E
-     C*MOVER ZVDCVE ZVTDIS
-     C                   Z-ADD     ZVTDIS        ZVDCVE
-     C* Cuotas C.V.E
-     C*MOVER ZCUCVE ZCTDIS
-     C                   Z-ADD     ZCTDIS        ZCUCVE
-     C*FIN
-     C                   END
-     C* Cuotas distribuidas terceros
-     C*SUMAR ZCUCVE ZCUDIT
-     C                   ADD       ZCUCVE        ZCUDIT
-     C* Total procesado terceros
-     C*SUMAR ZVDCVE ZTOTER
-     C                   ADD       ZVDCVE        ZTOTER
-     C* Cuotas disp. distr.
-     C*RESTAR ZCUCVE ZCTDIS
-     C                   SUB       ZCUCVE        ZCTDIS
-     C* Vlr disp. distrib.
-     C*RESTAR ZVDCVE ZVTDIS
-     C                   SUB       ZVDCVE        ZVTDIS
-     C*FIN
-     C                   END
      C*FIN
      C                   END
      C*
@@ -34659,21 +34203,6 @@
      C                   EXSR      M00019
      C*SINO
      C                   ELSE
-     C* Guarda valores en temporal por si cambian en M98415
-     C*MOVER ZH1POR ZHPPOR
-     C                   Z-ADD     ZHPPOR        ZH1POR
-     C*MOVER ZH1PO1 ZHPPO1
-     C                   Z-ADD     ZHPPO1        ZH1PO1
-     C*MOVER ZH1PO2 ZHPPO2
-     C                   Z-ADD     ZHPPO2        ZH1PO2
-     C*MOVER ZH1PO4 ZHPPO4
-     C                   Z-ADD     ZHPPO4        ZH1PO4
-     C*MOVER ZH1P49 ZHPP49
-     C                   Z-ADD     ZHPP49        ZH1P49
-     C*MOVER ZH1P50 ZHPP50
-     C                   Z-ADD     ZHPP50        ZH1P50
-     C*MOVER ZH1N05 ZHPN05
-     C                   Z-ADD     ZHPN05        ZH1N05
      C*PASAR ZPLAAA DEUNUM
      C                   MOVEL     DEUNUM        ZPLAAA
      C* Parametros decreto 558
@@ -38671,9 +38200,6 @@
      C                   EXSR      M00019
      C*FIN
      C                   END
-     C* Validar condiciones pago omisión
-     C*EJECUTAR M00220
-     C                   EXSR      M00220
      C*RECUPERARD (N) DETARC (PLANU3 PLANUM REZNR1 REZNR2)
      C     LL$161        KLIST
      C                   KFLD                    PLANU3
@@ -39058,9 +38584,6 @@
      C* Limpiar variables de HISAR4
      C*EJECUTAR M00150
      C                   EXSR      M00150
-     C* Validar condiciones pago omisión
-     C*EJECUTAR M00220
-     C                   EXSR      M00220
      C*RECUPERARD (N) DETARC (PLANU3 PLANUM REZNR1 REZNR2)
      C     LL$164        KLIST
      C                   KFLD                    PLANU3
@@ -39459,6 +38982,9 @@
      C* Procesa depósitos por detalle
      C*EJECUTAR M71120
      C                   EXSR      M71120
+     C* Acumula valores cotizaciones
+     C*EJECUTAR M14085
+     C                   EXSR      M14085
      C* No hay error
      C*SI ZSALIR |= '1'
      C     ZSALIR        IFNE      '1'
@@ -39538,9 +39064,6 @@
      C                   EXSR      M14080
      C*FIN
      C                   END
-     C* Acumula valores cotizaciones
-     C*EJECUTAR M14085
-     C                   EXSR      M14085
      C*FIN
      C                   END
      C* No hay error
@@ -43425,7 +42948,6 @@
      C                   MOVE      *BLANK        ZANUDE            1            Indicador de anular
      C                   Z-ADD     *ZERO         ZAPFSP            5 2          Anterior pct. Subsis
      C                   MOVE      *BLANK        ZAPLDE            1            es planilla decreto
-     C                   Z-ADD     *ZERO         ZARFGP           10 0          Alto riesgo + FGPM
      C                   Z-ADD     *ZERO         ZAUMCC            8 0          temporal acumulado i
      C                   Z-ADD     *ZERO         ZAUNFG            8 0          Acumulado FS agrem i
      C                   Z-ADD     *ZERO         ZAUNFS            8 0          Acumulado FS agrem i
@@ -43785,7 +43307,6 @@
      C                   MOVE      *BLANK        ZEXIST            1            Indica si existe reg
      C                   MOVE      *BLANK        ZEXITT            1            indicador de que exi
      C                   MOVE      *BLANK        ZEXI53            1            Ind. existe RECA53
-     C                   MOVE      *BLANK        ZEXPLZ            1            Ind. existe pla. Z A
      C                   MOVE      *BLANK        ZEXREG            1            Existencia de duplic
      C                   Z-ADD     *ZERO         ZEZNRO           12 0          Numero rezago aux
      C                   MOVE      *BLANK        ZF                8            Fecha de interés ley
@@ -43907,14 +43428,6 @@
      C                   Z-ADD     *ZERO         ZHPP50            5 2          Porc. a ditribuir su
      C                   Z-ADD     *ZERO         ZHPVA2            9 0          Valor salario mínimo
      C                   Z-ADD     *ZERO         ZHPV14            9 0          Valor límite para re
-     C                   Z-ADD     *ZERO         ZH1N05            2 0          Número de salarios m
-     C                   Z-ADD     *ZERO         ZH1POR            5 2          Porcentaje (Hoja I)
-     C                   Z-ADD     *ZERO         ZH1PO1            7 5          Porcentaje comisión
-     C                   Z-ADD     *ZERO         ZH1PO2            7 5          Porcentaje prima de
-     C                   Z-ADD     *ZERO         ZH1PO3            5 2          Porcentaje com. cot.
-     C                   Z-ADD     *ZERO         ZH1PO4            5 2          Porcentaje solidarid
-     C                   Z-ADD     *ZERO         ZH1P49            5 2          Porcentaje FGPM (Hoj
-     C                   Z-ADD     *ZERO         ZH1P50            5 2          Porc. a ditribuir su
      C                   Z-ADD     *ZERO         ZIADIA            3 0          Días acreditados aux
      C                   Z-ADD     *ZERO         ZIBCAF            9 0          Salario base de coti
      C                   Z-ADD     *ZERO         ZIBFSP            9 0          IBC para FSP
@@ -44433,7 +43946,6 @@
      C                   Z-ADD     *ZERO         ZPLP22           12 0          Planilla pago en exc
      C                   Z-ADD     *ZERO         ZPLREC           12 0          Planilla RPREDI50
      C                   Z-ADD     *ZERO         ZPLTO8           12 0          Total planilla
-     C                   MOVE      *BLANK        ZPLT03            2            Tipo de pago de plan
      C                   Z-ADD     *ZERO         ZPOAIN            5 2          Porcentaje anterior
      C                   MOVE      *BLANK        ZPOAIX            5            Porcentaje anterior
      C                   Z-ADD     *ZERO         ZPOFGP            5 2          Porcentaje F.G,P,M
@@ -44479,7 +43991,6 @@
      C                   Z-ADD     *ZERO         ZRENDI           11 0          Saldo por rendimient
      C                   MOVE      *BLANK        ZRENTR            1            Indicador reentrante
      C                   Z-ADD     *ZERO         ZRESTA           11 0          Resta
-     C                   Z-ADD     *ZERO         ZRESVA            3 0          Respuesta a validar
      C                   Z-ADD     *ZERO         ZRETCO           15 2          @movret - Valor de r
      C                   MOVE      *BLANK        ZREZEM            1            Indicador rezago no
      C                   MOVE      *BLANK        ZREZMS            1            Es rezago masivo
@@ -44488,11 +43999,9 @@
      C                   Z-ADD     *ZERO         ZRFS              9 0          Reporte valor fondo
      C                   Z-ADD     *ZERO         ZRIFS             9 0          Reporte valor int. f
      C                   Z-ADD     *ZERO         ZRING9            9 0          Rendimientos ING 9,0
-     C                   MOVE      *BLANK        ZRN117            1            Ind. existe resp. 11
      C                   Z-ADD     *ZERO         ZRPEEM            9 0          Valor pago en exceso
      C                   Z-ADD     *ZERO         ZRPS              9 0          Reporte valor prima
      C                   Z-ADD     *ZERO         ZRREIN            9 0          Reporte valor rendim
-     C                   MOVE      *BLANK        ZRZOMI            1            Indicador de rezago
      C                   Z-ADD     *ZERO         ZR3422            1 0          Indicador desarrollo
      C                   MOVE      *BLANK        ZR7421            1            Desarrollo especial
      C                   MOVE      *BLANK        ZR7436            1            Trabajo - Desarrollo
@@ -44759,7 +44268,6 @@
      C                   MOVE      *BLANK        ZTPGRT            2            Tipo de pago planill
      C                   MOVE      *BLANK        ZTPLA             2            @PLATIP - Tipo plani
      C                   Z-ADD     *ZERO         ZTPLAE            4 0          Total planillas erra
-     C                   MOVE      *BLANK        ZTPORI            1            Tipo de planilla PIL
      C                   Z-ADD     *ZERO         ZTPROC            1 0          Proceso que genera m
      C                   MOVE      *BLANK        ZTPVAE            1            Planilla de validaci
      C                   MOVE      *BLANK        ZTPVDF            1            Tipo validación por
@@ -44947,7 +44455,6 @@
      C                   Z-ADD     *ZERO         ZVRINA           15 0          Valor a fecha fondo
      C                   Z-ADD     *ZERO         ZVRINC           11 0          Trabajo - Valor inte
      C                   Z-ADD     *ZERO         ZVRINT           11 0          Trabajo - Valor inte
-     C                   Z-ADD     *ZERO         ZVROMI           11 0          Valor rezago de omis
      C                   Z-ADD     *ZERO         ZVRPA             9 0          Valor pago en exceso
      C                   Z-ADD     *ZERO         ZVRPAD           15 0          Valor pagado detalle
      C                   Z-ADD     *ZERO         ZVRPAG           11 0          Valor pagado
